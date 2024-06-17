@@ -130,26 +130,33 @@ const editBookByIdHandler = (request, h) => {
 
   // id not found
   if (index === -1) {
-    return h.response({
-      status: "fail",
-      message: "Gagal memperbarui buku. Id tidak ditemukan",
-    }).code(404);
+    return h
+      .response({
+        status: "fail",
+        message: "Gagal memperbarui buku. Id tidak ditemukan",
+      })
+      .code(404);
   }
 
-   // name field empty
-   if (!name) {
-    return h.response({
-      status: "fail",
-      message: "Gagal memperbarui buku. Mohon isi nama buku",
-    }).code(400);
+  // name field empty
+  if (!name) {
+    return h
+      .response({
+        status: "fail",
+        message: "Gagal memperbarui buku. Mohon isi nama buku",
+      })
+      .code(400);
   }
 
   // readPage > pageCount
   if (readPage > pageCount) {
-    return h.response({
-      status: "fail",
-      message: "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount",
-    }).code(400);
+    return h
+      .response({
+        status: "fail",
+        message:
+          "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount",
+      })
+      .code(400);
   }
 
   books[index] = {
@@ -165,9 +172,31 @@ const editBookByIdHandler = (request, h) => {
     updatedAt,
   };
 
+  return h
+    .response({
+      status: "success",
+      message: "Buku berhasil diperbarui",
+    })
+    .code(200);
+};
+
+const deleteBookByIdHandler = (request, h) => {
+  const { bookId } = request.params;
+
+  const index = books.findIndex((book) => book.id === bookId);
+
+  if (index === -1) {
+    return h.response({
+      status: "fail",
+      message: "Buku gagal dihapus. Id tidak ditemukan",
+    }).code(404);
+  }
+
+  books.splice(index, 1);
+
   return h.response({
     status: "success",
-    message: "Buku berhasil diperbarui",
+    message: "Buku berhasil dihapus",
   }).code(200);
 };
 
@@ -176,4 +205,5 @@ module.exports = {
   getAllBooksHandler,
   getBookByIdHandler,
   editBookByIdHandler,
+  deleteBookByIdHandler,
 };
