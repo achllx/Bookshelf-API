@@ -78,16 +78,41 @@ const addBookHandler = (request, h) => {
 };
 
 // get all book
-const getAllBooksHandler = () => ({
-  status: "success",
-  data: {
-    books: books.map((book) => ({
-      id: book.id,
-      name: book.name,
-      publisher: book.publisher,
-    })),
-  },
-});
+const getAllBooksHandler = (request) => {
+  const { name, reading, finished } = request.query;
+
+  // Filtering based on query parameters
+  let filteredBooks = books;
+
+  // Filter by name (case insensitive)
+  if (name) {
+    const lowerCaseName = name.toLowerCase();
+    filteredBooks = filteredBooks.filter((book) => book.name.toLowerCase().includes(lowerCaseName));
+  }
+
+  // Filter by reading status
+  if (reading !== undefined && (reading === "0" || reading === "1")) {
+    const isReading = reading === "1";
+    filteredBooks = filteredBooks.filter((book) => book.reading === isReading);
+  }
+
+  // Filter by finished status
+  if (finished !== undefined && (finished === "0" || finished === "1")) {
+    const isFinished = finished === "1";
+    filteredBooks = filteredBooks.filter((book) => book.finished === isFinished);
+  }
+
+  return {
+    status: "success",
+    data: {
+      books: filteredBooks.map((book) => ({
+        id: book.id,
+        name: book.name,
+        publisher: book.publisher,
+      })),
+    },
+  };
+};
 
 // get book by id
 const getBookByIdHandler = (request, h) => {
@@ -190,18 +215,22 @@ const deleteBookByIdHandler = (request, h) => {
   const index = books.findIndex((book) => book.id === bookId);
 
   if (index === -1) {
-    return h.response({
-      status: "fail",
-      message: "Buku gagal dihapus. Id tidak ditemukan",
-    }).code(404);
+    return h
+      .response({
+        status: "fail",
+        message: "Buku gagal dihapus. Id tidak ditemukan",
+      })
+      .code(404);
   }
 
   books.splice(index, 1);
 
-  return h.response({
-    status: "success",
-    message: "Buku berhasil dihapus",
-  }).code(200);
+  return h
+    .response({
+      status: "success",
+      message: "Buku berhasil dihapus",
+    })
+    .code(200);
 };
 
 module.exports = {
